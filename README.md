@@ -1,6 +1,6 @@
 ---
 title: CyberSim AI
-emoji: shield
+emoji: 🛡️
 colorFrom: blue
 colorTo: gray
 sdk: docker
