@@ -1,3 +1,12 @@
+---
+title: CyberSim AI
+emoji: shield
+colorFrom: blue
+colorTo: gray
+sdk: docker
+pinned: false
+---
+
 # CyberSim AI (OpenEnv-style Cyber Defense Benchmark)
 
 CyberSim AI is a deterministic, modular cybersecurity simulation environment for evaluating agents on realistic SOC workflows:
