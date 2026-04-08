@@ -1,0 +1,33 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: inference.py",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/inference.py",
+      "console": "integratedTerminal",
+      "env": {
+        "CYBERSIM_TASK": "brute_force",
+        "SEED": "42",
+        "MAX_STEPS": "24"
+      }
+    },
+    {
+      "name": "Python: run_openai_baseline.py",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/run_openai_baseline.py",
+      "console": "integratedTerminal",
+      "args": [
+        "--tasks",
+        "brute_force",
+        "malware_spread",
+        "data_exfiltration",
+        "--compare-agent",
+        "baseline"
+      ]
+    }
+  ]
+}
+

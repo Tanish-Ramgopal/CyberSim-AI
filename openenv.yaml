@@ -1,0 +1,26 @@
+name: cybersim-ai
+version: 0.1.0
+domain: cybersecurity-defense
+description: Deterministic cybersecurity simulation environment for evaluating defensive agents.
+entrypoint: app.py
+tags:
+  - openenv
+  - cybersecurity
+  - simulation
+tasks:
+  - brute_force
+  - malware_spread
+  - data_exfiltration
+observation_model: cybersim.models.Observation
+action_model: cybersim.models.Action
+reward_model: cybersim.models.Reward
+episode:
+  termination:
+    - goal_reached
+    - max_ticks_reached
+grader:
+  type: deterministic
+  score_range: [0.0, 1.0]
+reproducibility:
+  deterministic_with_seed: true
+

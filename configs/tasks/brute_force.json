@@ -1,0 +1,20 @@
+{
+  "task_name": "brute_force_detection",
+  "description": "Detect and block repeated failed SSH login attempts from one source.",
+  "difficulty": "easy",
+  "attack_type": "brute_force",
+  "max_ticks": 18,
+  "initial_state": {
+    "servers": ["auth-srv-01", "db-srv-02"],
+    "users": ["admin", "svc-backup", "analyst"]
+  },
+  "goal": "Block attacking IP within 10 failed attempts",
+  "constraints": ["No manual intervention", "Only agent actions are allowed"],
+  "attack": {
+    "attacker_ip": "203.0.113.66",
+    "target_host": "auth-srv-01",
+    "target_user": "admin",
+    "success_after_failures": 12
+  }
+}
+

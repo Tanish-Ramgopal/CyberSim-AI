@@ -1,0 +1,41 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "CyberSim: Run Easy",
+      "type": "shell",
+      "command": "python run_simulation.py --task brute_force --agent baseline --seed 42"
+    },
+    {
+      "label": "CyberSim: Run Medium",
+      "type": "shell",
+      "command": "python run_simulation.py --task malware_spread --agent baseline --seed 42"
+    },
+    {
+      "label": "CyberSim: Run Hard",
+      "type": "shell",
+      "command": "python run_simulation.py --task data_exfiltration --agent baseline --seed 42"
+    },
+    {
+      "label": "CyberSim: Run All (baseline)",
+      "type": "shell",
+      "command": "python run_simulation.py --task brute_force --agent baseline --seed 42 > artifacts/score_easy.json; python run_simulation.py --task malware_spread --agent baseline --seed 42 > artifacts/score_medium.json; python run_simulation.py --task data_exfiltration --agent baseline --seed 42 > artifacts/score_hard.json; python -c \"import json, pathlib; p=pathlib.Path('artifacts'); e=json.loads((p/'score_easy.json').read_text()); m=json.loads((p/'score_medium.json').read_text()); h=json.loads((p/'score_hard.json').read_text()); print(f'easy: {e[\\\"score\\\"]:.4f}'); print(f'medium: {m[\\\"score\\\"]:.4f}'); print(f'hard: {h[\\\"score\\\"]:.4f}')\""
+    },
+    {
+      "label": "CyberSim: Run Judge Scoreboard",
+      "type": "shell",
+      "command": "python scripts/run_openai_baseline.py --tasks brute_force malware_spread data_exfiltration --compare-agent baseline"
+    },
+    {
+      "label": "CyberSim: Run Inference",
+      "type": "shell",
+      "command": "python inference.py"
+    },
+    {
+      "label": "CyberSim: Run Tests",
+      "type": "shell",
+      "command": "python -m unittest discover -s tests -p \"test_*.py\""
+    }
+  ]
+}
+

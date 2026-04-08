@@ -1,0 +1,22 @@
+{
+  "task_name": "suspicious_outbound_traffic",
+  "description": "Detect beaconing and stop data exfiltration to an untrusted external destination.",
+  "difficulty": "hard",
+  "attack_type": "data_exfiltration",
+  "max_ticks": 24,
+  "initial_state": {
+    "servers": ["app-srv-01", "app-srv-02", "backup-srv-01"],
+    "trusted_domains": ["api.internal.corp", "backup.internal.corp"]
+  },
+  "goal": "Isolate compromised host after suspicious outbound transfer pattern appears",
+  "constraints": ["No internet-wide block rules", "No manual intervention"],
+  "attack": {
+    "compromised_host": "app-srv-02",
+    "destination": "198.51.100.44",
+    "beacon_every_ticks": 2,
+    "required_stage": 3,
+    "decoy_hosts": ["app-srv-01", "backup-srv-01"],
+    "fallback_host": "backup-srv-01"
+  }
+}
+
