@@ -2,7 +2,7 @@ name: cybersim-ai
 version: 0.1.0
 domain: cybersecurity-defense
 description: Deterministic cybersecurity simulation environment for evaluating defensive agents.
-entrypoint: app.py
+entrypoint: server/app.py
 tags:
   - openenv
   - cybersecurity
