@@ -18,6 +18,7 @@ episode:
   termination:
     - goal_reached
     - max_ticks_reached
+# Rubric weights: cybersim/grader/spec.py + README.md ## Grader (must stay aligned)
 grader:
   type: deterministic
   score_range: [0.0, 1.0]

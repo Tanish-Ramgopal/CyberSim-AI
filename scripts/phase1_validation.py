@@ -30,7 +30,7 @@ def main() -> None:
     assert_true(any(line.startswith("[STEP] ") for line in lines), "No STEP lines emitted")
     checks.append("inference_format")
 
-    # 3 tasks + grader in [0,1]
+    # 3 tasks + DeterministicGrader score in [0,1] (see cybersim/grader/spec.py)
     for task in ["brute_force", "malware_spread", "data_exfiltration"]:
         code, out = run_cmd([sys.executable, "run_simulation.py", "--task", task, "--agent", "baseline", "--seed", "42"])
         assert_true(code == 0, f"run_simulation failed for {task}")

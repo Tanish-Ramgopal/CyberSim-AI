@@ -1,3 +1,5 @@
+"""Variance checks across agents; scores from `DeterministicGrader` (`cybersim/grader/spec.py`)."""
+
 from __future__ import annotations
 
 import argparse

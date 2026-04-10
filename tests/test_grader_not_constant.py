@@ -1,3 +1,5 @@
+"""Grader sensitivity; rubric weights in `cybersim/grader/spec.py`."""
+
 from __future__ import annotations
 
 import unittest

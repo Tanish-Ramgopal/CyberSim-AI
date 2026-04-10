@@ -281,6 +281,7 @@ class SimulationEnvironment:
                 )
 
     def _compute_step_reward(self, action: Action) -> Reward:
+        """Dense shaping only; episode quality uses `DeterministicGrader` (`cybersim/grader/spec.py`)."""
         components = {
             "progress": 0.0,
             "efficiency_penalty": 0.0,

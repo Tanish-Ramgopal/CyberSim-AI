@@ -2,24 +2,18 @@
 
 from __future__ import annotations
 
-import importlib.util
+import sys
 from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parent.parent
+_root_str = str(_ROOT)
+if _root_str not in sys.path:
+    sys.path.insert(0, _root_str)
 
+# Repo-root FastAPI app (app.py). Normal import avoids importlib + Pydantic OpenAPI bugs.
+from app import app  # noqa: E402
 
-def _load_root_app():
-    """Load repo-root app.py without shadowing this module (also named app.py)."""
-    path = _ROOT / "app.py"
-    spec = importlib.util.spec_from_file_location("cybersim_root_app", path)
-    if spec is None or spec.loader is None:
-        raise RuntimeError(f"Cannot load API module from {path}")
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return mod.app
-
-
-app = _load_root_app()
+__all__ = ["app", "main"]
 
 
 def main() -> None:

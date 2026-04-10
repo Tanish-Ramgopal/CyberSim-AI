@@ -1,11 +1,66 @@
 # CyberSim AI (OpenEnv-style Cyber Defense Benchmark)
 
+**🏆 Meta PyTorch Hackathon 2026 Submission**
+
 CyberSim AI is a deterministic, modular cybersecurity simulation environment for evaluating agents on realistic SOC workflows:
 - detecting SSH brute-force attempts,
 - containing malware spread,
 - stopping suspicious outbound exfiltration.
 
 The project is structured to satisfy OpenEnv-style requirements: typed models, `reset()/step()/state()` lifecycle, reproducible grading, and containerized execution.
+
+---
+
+## 🎯 For Meta Hackathon Participants
+
+### ⚡ Quick Start Submission Guide
+
+**BEFORE SUBMITTING:**
+1. Run the pre-submission validator:
+   ```bash
+   python meta_hackathon_validator.py
+   ```
+   All checks must PASS or your submission will be disqualified.
+
+2. Review the submission guide:
+   - [META_HACKATHON_SUBMISSION_GUIDE.md](META_HACKATHON_SUBMISSION_GUIDE.md) - Step-by-step instructions
+   - [META_HACKATHON_COMPLIANCE_CHECKLIST.md](META_HACKATHON_COMPLIANCE_CHECKLIST.md) - Compliance verification
+
+3. Key Dates:
+   - **Build & Test:** Now - 10th April
+   - **Deploy & Validate:** 11th April
+   - **DEADLINE:** 12th April 11:59 PM IST
+
+### ✅ Submission Checklist
+
+- [ ] Run `python meta_hackathon_validator.py` → ALL PASS
+- [ ] `inference.py` in root directory
+- [ ] Environment variables: API_BASE_URL, MODEL_NAME, HF_TOKEN
+- [ ] Logging format: strict [START], [STEP], [END]
+- [ ] Scores in [0.0, 1.0] range
+- [ ] 3+ tasks with graders
+- [ ] Dockerfile builds successfully
+- [ ] Deployed to Hugging Face Spaces
+- [ ] Submit HF Space URL before deadline
+
+### 📚 Documentation
+
+For hackathon-specific guidance, see:
+1. **[META_HACKATHON_SUBMISSION_GUIDE.md](META_HACKATHON_SUBMISSION_GUIDE.md)** - Complete submission walkthrough
+2. **[META_HACKATHON_COMPLIANCE_CHECKLIST.md](META_HACKATHON_COMPLIANCE_CHECKLIST.md)** - Requirement checklist
+3. **[SCORING_GUIDE.md](SCORING_GUIDE.md)** - Detailed scoring explanation
+4. **[scoring_script.py](scoring_script.py)** - Local testing & scoring
+
+### 🔧 Run Validator
+
+```bash
+# Full validation (tests all hackathon requirements)
+python meta_hackathon_validator.py
+```
+
+Expected output: ✅ ALL VALIDATIONS PASSED
+
+---
 
 ## Motivation
 
@@ -17,7 +72,7 @@ SOC analysts repeatedly perform triage and mitigation tasks under incomplete tel
 cybersim/
   agents/                  # baseline agent and factory
   environment/             # simulation engine + telemetry generation
-  grader/                  # deterministic 0.0-1.0 grader
+  grader/                  # spec.py (weights) + core.py (DeterministicGrader)
   tasks/                   # task registry/loading
   models.py                # typed Action/Observation/Reward models (Pydantic)
 configs/tasks/             # config-driven tasks
@@ -43,15 +98,15 @@ Dockerfile
 - defensive state (`blocked_ips`, `isolated_hosts`, `alerts`)
 - threat state (`active_threat`)
 
-## Reward Design
+## Reward Design (per-step, not the grader)
 
-Each `step(action)` returns a typed `Reward` model:
-- positive reward for correct mitigation/progress,
-- mild efficiency penalty for excessive interventions,
-- false-positive penalty for invalid actions,
-- small persistent penalty while threat remains active.
+Each `step(action)` returns a typed `Reward` model used for **dense trajectory feedback** inside `SimulationEnvironment`:
+- positive components for correct mitigation / progress,
+- mild efficiency penalty for non-`noop` actions,
+- false-positive style penalty for invalid actions,
+- small threat-related penalties while a threat is active.
 
-This provides dense trajectory signal rather than pure terminal reward.
+These **per-step** values are **independent** from the episode **`DeterministicGrader`** score in **[0.0, 1.0]** (see **Grader** below). The grader consumes final `metrics` and `success`, not the sum of step rewards.
 
 ## Implemented Tasks (Difficulty Progression)
 
@@ -63,11 +118,30 @@ All tasks are config-driven JSON definitions in `configs/tasks`.
 
 ## Grader
 
-`DeterministicGrader` outputs normalized score in **[0.0, 1.0]**:
-- +0.50 detected threat,
-- +0.30 successful mitigation,
-- +0.00..+0.20 response-time bonus,
-- -0.00..-0.30 false-positive penalty.
+**Single source of truth:** `cybersim/grader/spec.py` defines every weight; `cybersim/grader/core.py` implements `DeterministicGrader.evaluate`. README tables below **must** match `spec.py`; judges may treat mismatches as invalid.
+
+Output is a normalized score in **[0.0, 1.0]** via `max(0.0, min(1.0, round(score, 4)))`.
+
+**Additive terms (before penalties):**
+
+| Component | Value |
+|-----------|--------|
+| Threat detected (`attack_detected`) | **+0.45** |
+| Mitigation (`success` or `mitigated`) | **+0.25** |
+| Response speed | **+0.0 … +0.15**: if `first_response_tick` is set, `max(0, 0.15 - (first_tick / max_ticks) * 0.15)`; else **0** |
+| Difficulty calibration | **easy +0.10** · **medium +0.03** · **hard +0.0** (from `metrics["difficulty"]`, default `medium`) |
+
+**Subtractive penalties (capped per line, then summed):**
+
+| Penalty | Formula | Cap |
+|---------|---------|-----|
+| False positives | `false_positives * 0.12` | min with **0.40** |
+| Wrong actions | `wrong_actions * 0.12` | min with **0.40** |
+| Decoy hits | `decoy_hits * 0.15` | min with **0.30** |
+| Stage misses | `stage_misses * 0.15` | min with **0.30** |
+| Hard chain | **0.18** if `difficulty == "hard"` and `len(actions_taken) < 3`, else **0** | — |
+
+Final score: `max(0.0, min(1.0, round(score, 4)))` where `score` is additive terms minus total penalties.
 
 Grading is deterministic and reproducible for fixed seed + task + agent behavior.
 

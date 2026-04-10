@@ -1,3 +1,5 @@
+"""Judge-facing LLM runner. Terminal `score` comes from `DeterministicGrader` — see `cybersim/grader/spec.py` / README ## Grader."""
+
 from __future__ import annotations
 
 import json

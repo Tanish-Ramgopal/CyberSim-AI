@@ -1,3 +1,5 @@
+"""Multi-task LLM evaluation; scores use `DeterministicGrader` — see `cybersim/grader/spec.py`."""
+
 from __future__ import annotations
 
 import argparse
