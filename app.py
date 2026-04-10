@@ -27,6 +27,17 @@ class StepRequest(BaseModel):
     metadata: Dict[str, Any] = Field(default_factory=dict)
 
 
+@app.get("/")
+def root() -> Dict[str, Any]:
+    return {
+        "name": "CyberSim AI API",
+        "status": "running",
+        "health": "/health",
+        "tasks": "/tasks",
+        "flow": ["POST /reset", "POST /step", "GET /state", "POST /close"],
+    }
+
+
 @app.get("/health")
 def health() -> Dict[str, str]:
     return {"status": "ok"}
